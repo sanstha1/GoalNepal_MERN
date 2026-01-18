@@ -3,11 +3,9 @@ import { UserSchema } from "../types/user.type";
 
 export const CreateUserDto = UserSchema.pick(//resuse schema
     {
-        username : true,
+        fullname : true,
         email: true,
         password: true,
-        firstName: true,
-        lastName: true,
     }
 ).extend( //add new attributes to schema
     {
@@ -28,7 +26,7 @@ export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
 
 //can use UserSchema or make a new schema
 export const LoginUserDto = z.object({
-    username : z.string().min(3,'Username is required'),
+    email : z.string().min(3,'Email is required'),
     password: z.string().min(6,'Password is required'),
 });
 export type LoginUserDto = z.infer<typeof LoginUserDto>;

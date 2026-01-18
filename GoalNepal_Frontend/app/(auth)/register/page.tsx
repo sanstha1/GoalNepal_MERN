@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/lib/validation";
 import InputField from "@/components/inputfield";
 import Image from "next/image";
+import { handleRegister } from "@/lib/actions/auth-action";
 
 type RegisterForm = {
   name: string;
@@ -25,8 +26,11 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = () => {
-    router.push("/login");
+  const onSubmit = async (data: RegisterForm) => {
+    const result = await handleRegister(data);
+    if (result.success) {
+      router.push("/login");
+    }
   };
 
   return (
@@ -36,14 +40,39 @@ export default function RegisterPage() {
           onSubmit={handleSubmit(onSubmit)}
           className="p-8 w-96 border border-black rounded-xl"
         >
-          <h1 className="text-2xl font-bold text-center mb-6 text-black">REGISTER</h1>
+          <h1 className="text-2xl font-bold text-center mb-6 text-black">
+            REGISTER
+          </h1>
 
-          <InputField label="Full Name" type="text" register={register("name")} error={errors.name} />
-          <InputField label="Email" type="email" register={register("email")} error={errors.email} />
-          <InputField label="Password" type="password" register={register("password")} error={errors.password} />
-          <InputField label="Confirm Password" type="password" register={register("confirmPassword")} error={errors.confirmPassword} />
+          <InputField
+            label="Full Name"
+            type="text"
+            register={register("name")}
+            error={errors.name}
+          />
+          <InputField
+            label="Email"
+            type="email"
+            register={register("email")}
+            error={errors.email}
+          />
+          <InputField
+            label="Password"
+            type="password"
+            register={register("password")}
+            error={errors.password}
+          />
+          <InputField
+            label="Confirm Password"
+            type="password"
+            register={register("confirmPassword")}
+            error={errors.confirmPassword}
+          />
 
-          <button type="submit" className="w-full bg-black text-white py-2 rounded mt-4">
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2 rounded mt-4"
+          >
             Sign Up
           </button>
 

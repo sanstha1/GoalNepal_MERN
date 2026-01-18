@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validation";
 import InputField from "@/components/inputfield";
 import Image from "next/image";
+import { handleLogin } from "@/lib/actions/auth-action";
 
 type LoginForm = {
   email: string;
@@ -23,8 +24,11 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = () => {
-    router.push("/home");
+  const onSubmit = async (data: LoginForm) => {
+    const result = await handleLogin(data);
+    if (result.success) {
+      router.push("/home");
+    }
   };
 
   return (
@@ -34,7 +38,7 @@ export default function LoginPage() {
           src="/images/image.png"
           alt="Football Image"
           width={350}
-          height={350} 
+          height={350}
           className="mb-6"
         />
         <h2 className="text-3xl font-bold text-center">
@@ -47,7 +51,9 @@ export default function LoginPage() {
           onSubmit={handleSubmit(onSubmit)}
           className="bg-[#fefee3] p-8 w-96 rounded-xl border border-black"
         >
-          <h1 className="text-2xl font-bold text-center mb-6 text-black">LOG IN</h1>
+          <h1 className="text-2xl font-bold text-center mb-6 text-black">
+            LOG IN
+          </h1>
 
           <InputField
             label="Email"

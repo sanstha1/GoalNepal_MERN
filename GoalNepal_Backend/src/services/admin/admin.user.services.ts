@@ -13,8 +13,8 @@ export class AdminUserService {
             throw new HttpError(403, "Email already in use");
         }
 
-        const checkUsername = await userRepository.getUserbyUsername(data.username);
-        if (checkUsername) {
+        const checkFullname = await userRepository.getUserbyUsername(data.fullname);
+        if (checkFullname) {
             throw new HttpError(403, "Username already in use");
         }
 

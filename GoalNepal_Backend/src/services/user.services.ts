@@ -15,10 +15,10 @@ export class UserService {
             throw new HttpError(403, "Email already in use");
         }
 
-        const checkUsername = await userRepository.getUserbyUsername(data.username);
-        if (checkUsername) {
-            throw new HttpError(403, "Username already in use");
-        }
+        // const checkFullname = await userRepository.getUserbyUsername(data.fullname);
+        // if (checkFullname) {
+        //     throw new HttpError(403, "Username already in use");
+        // }
 
         const hashedPassword = await bcryptjs.hash(data.password, 10);
 
@@ -31,7 +31,7 @@ export class UserService {
     }
 
     async LoginUser(data: LoginUserDto) {
-        const existingUser = await userRepository.getUserbyUsername(data.username);
+        const existingUser = await userRepository.getUserbyEmail(data.email);
 
         if (!existingUser) {
             throw new HttpError(404, "User not found");
@@ -48,7 +48,6 @@ export class UserService {
 
         const payload = {
             id: existingUser._id,
-            username: existingUser.username,
             email: existingUser.email,
             role: existingUser.role,
         };
