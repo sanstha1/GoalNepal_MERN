@@ -7,6 +7,7 @@ import { registerSchema } from "@/lib/validation";
 import InputField from "@/components/inputfield";
 import Image from "next/image";
 import { handleRegister } from "@/lib/actions/auth-action";
+import { useState } from "react";
 
 type RegisterForm = {
   name: string;
@@ -17,9 +18,10 @@ type RegisterForm = {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const {
-    register,
+    register: formRegister,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterForm>({
@@ -27,9 +29,25 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterForm) => {
-    const result = await handleRegister(data);
-    if (result.success) {
-      router.push("/login");
+    try {
+      setLoading(true);
+      const result = await handleRegister({
+        fullName: data.name,
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (result.success) {
+        alert("Registration successful!");
+        router.push("/login");
+      } else {
+        alert(result.message);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Registration failed";
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,33 +65,34 @@ export default function RegisterPage() {
           <InputField
             label="Full Name"
             type="text"
-            register={register("name")}
+            register={formRegister("name")}
             error={errors.name}
           />
           <InputField
             label="Email"
             type="email"
-            register={register("email")}
+            register={formRegister("email")}
             error={errors.email}
           />
           <InputField
             label="Password"
             type="password"
-            register={register("password")}
+            register={formRegister("password")}
             error={errors.password}
           />
           <InputField
             label="Confirm Password"
             type="password"
-            register={register("confirmPassword")}
+            register={formRegister("confirmPassword")}
             error={errors.confirmPassword}
           />
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded mt-4"
+            disabled={loading}
+            className="w-full bg-black text-white py-2 rounded mt-4 disabled:opacity-50"
           >
-            Sign Up
+            {loading ? "Signing Up..." : "Sign Up"}
           </button>
 
           <p className="text-center mt-4 text-sm text-black">
@@ -97,7 +116,7 @@ export default function RegisterPage() {
           className="mb-6 scale-x-[-1]"
         />
         <h2 className="text-3xl font-bold text-center mt-4">
-          Building Nepal’s <br /> Football Future
+          Building Nepal&apos;s <br /> Football Future
         </h2>
       </div>
     </div>

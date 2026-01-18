@@ -3,28 +3,35 @@ import { cookies } from "next/headers"
 
 export const setAuthToken = async (token: string) => {
     const cookieStore = await cookies();
-    cookieStore.set({ name: "auth_token", value: token })
+    cookieStore.set('auth_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+    });
 }
+
 export const getAuthToken = async () => {
     const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value;
-    return token || null;
+    return cookieStore.get("auth_token")?.value || null;
 }
+
 export const setUserData = async (userData: unknown) => {
     const cookieStore = await cookies();
-    // cookie can only store string
-    // convert object to string -> JSON.stringify "{}"
-    cookieStore.set({ name: "user_data", value: JSON.stringify(userData) })
+    cookieStore.set('user_data', JSON.stringify(userData), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+    });
 }
+
 export const getUserData = async () => {
     const cookieStore = await cookies();
     const userData = cookieStore.get("user_data")?.value;
-    if (userData) {
-        // convert string to object -> JSON.parse
-        return JSON.parse(userData);
-    }
-    return null;
+    return userData ? JSON.parse(userData) : null;
 }
+
 export const clearAuthCookies = async () => {
     const cookieStore = await cookies();
     cookieStore.delete("auth_token");

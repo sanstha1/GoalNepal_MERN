@@ -7,6 +7,7 @@ import { loginSchema } from "@/lib/validation";
 import InputField from "@/components/inputfield";
 import Image from "next/image";
 import { handleLogin } from "@/lib/actions/auth-action";
+import { useState } from "react";
 
 type LoginForm = {
   email: string;
@@ -15,6 +16,7 @@ type LoginForm = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -25,9 +27,24 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    const result = await handleLogin(data);
-    if (result.success) {
-      router.push("/home");
+    try {
+      setLoading(true);
+      const result = await handleLogin({
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (result.success) {
+        alert("Login successful!");
+        router.push("/home");
+      } else {
+        alert(result.message);
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Login failed";
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,7 +59,7 @@ export default function LoginPage() {
           className="mb-6"
         />
         <h2 className="text-3xl font-bold text-center">
-          Nepal’s Home for <br /> Football & Futsal Events
+          Nepal&apos;s Home for <br /> Football & Futsal Events
         </h2>
       </div>
 
@@ -69,12 +86,16 @@ export default function LoginPage() {
             error={errors.password}
           />
 
-          <button className="w-full bg-black text-white py-2 rounded mt-4">
-            Login
+          <button 
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-2 rounded mt-4 disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           <p className="text-center mt-4 text-sm text-black">
-            Don’t have an account?{" "}
+            Don&apos;t have an account?{" "}
             <span
               onClick={() => router.push("/register")}
               className="font-bold cursor-pointer"
